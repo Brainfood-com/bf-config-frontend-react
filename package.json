@@ -1,0 +1,21 @@
+{
+  "name": "bf-config-frontend-react",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack-dev-server --hot --progress --colors",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "es6-enum": "^1.1.0",
+    "react": "^16.8.6",
+    "react-redux": "^7.0.2",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
+  }
+}

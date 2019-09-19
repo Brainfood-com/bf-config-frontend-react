@@ -1,11 +1,9 @@
 import Enum from 'es6-enum'
 import React from 'react'
-import {withStyles} from '@material-ui/core/styles'
-import classNames from 'classnames'
 import Immutable from 'immutable'
 
 import thunk from 'redux-thunk'
-import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import {Provider, connect} from 'react-redux'
 
 // simple utilities
@@ -25,7 +23,7 @@ const rolesToMapUpdate = (rolesItem, value) => {
   }
 }
 
-const resolveRoles = (rolesItem, value) => resolveData(rolesItem).then(rolesItem -> rolesToMapUpdate(rolesItem, value))
+const resolveRoles = (rolesItem, value) => resolveData(rolesItem).then(rolesItem => rolesToMapUpdate(rolesItem, value))
 
 const ACTIONS = Enum(
   'MERGE_ROLES',
@@ -58,7 +56,7 @@ function reducer(state = defaultState, action) {
 
 const configStore = createStore(
   reducer,
-  compose(applyMiddleware(thunk)),
+  applyMiddleware(thunk),
 )
 
 const configConnect = options => Component => {
@@ -67,10 +65,12 @@ const configConnect = options => Component => {
   return props => <Provider context={ConfigContext} store={configStore}><ConnectedComponent {...props}/></Provider>
 }
 
-const addRoles = roles => dispatch => resolveRoles(roles, true).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles})
-const removeRoles = roles => dispatch => resolveRoles(roles, false).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles})
-const mergeRoles = roles => dispatch => resolveData(roles).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles})
+const addRoles = roles => dispatch => resolveRoles(roles, true).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles}))
+const removeRoles = roles => dispatch => resolveRoles(roles, false).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles}))
+const mergeRoles = roles => dispatch => resolveData(roles).then(roles => dispatch({type: ACTIONS.MERGE_ROLES, roles}))
 const clearRoles = dispatch => dispatch({type: ACTIONS.CLEAR_ROLES})
+
+export const wrapWithDispatch = (dispatch, obj) => Object.entries(obj).reduce((result, [key, value]) => (result[key] = (...args) => dispatch(value(...args)), result), {})
 
 export const configPick = (...picked) => {
   function mapDispatchToProps(dispatch) {
@@ -90,9 +90,8 @@ export const configPick = (...picked) => {
           result.clearRoles = clearRoles
           break
       }
-      Object.entries(([key, value) => result[key] = (...args) => dispatch(value(...args))
     }
-    return result
+    return wrapWithDispatch(dispatch, result)
   }
 
   function mapStateToProps(store, props) {
